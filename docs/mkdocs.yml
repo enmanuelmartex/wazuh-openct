@@ -1,0 +1,88 @@
+site_name: Wazuh + OpenCTI Threat Intelligence Integration
+site_description: >-
+  Custom Wazuh integration that enriches alerts with OpenCTI threat intelligence,
+  supporting modern OpenCTI (6.x / 7.x) and multiple Sysmon, FIM and Linux sources.
+site_author: ""
+# site_url: https://<your-org>.github.io/<your-repo>/
+
+# repo_url: https://github.com/<your-org>/<your-repo>
+# repo_name: <your-org>/<your-repo>
+
+theme:
+  name: material
+  language: en
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - toc.follow
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - search.suggest
+    - search.highlight
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - footnotes
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+plugins:
+  - search
+
+nav:
+  - Home: index.md
+  - Getting started:
+      - Requirements: getting-started/requirements.md
+      - Compatibility: getting-started/compatibility.md
+      - How it works: getting-started/how-it-works.md
+  - What's new: whats-new.md
+  - Installation:
+      - Integration files: installation/integration-files.md
+      - Manager configuration: installation/manager-configuration.md
+      - Detection rules: installation/detection-rules.md
+  - Data sources:
+      - Overview: data-sources/overview.md
+      - Syscheck (FIM): data-sources/syscheck-fim.md
+      - Sysmon (Windows): data-sources/sysmon.md
+      - Command-line IoCs: data-sources/commandline-iocs.md
+      - Linux sources: data-sources/linux-sources.md
+  - Event types: event-types.md
+  - Step-by-step guide: guide/step-by-step.md
+  - Testing & troubleshooting: testing-troubleshooting.md
+  - Reference:
+      - Script internals: reference/script-internals.md
