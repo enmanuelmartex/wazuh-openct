@@ -59,7 +59,7 @@ is up.
 
 If you ported an **older** script, its filter syntax is incompatible with 6.x/7.x.
 Use **this fork**, which uses the `mode` / `filters` / `filterGroups` structure.
-See [Compatibility](getting-started/compatibility.md).
+See [Compatibility](compatibility.md).
 
 ### `401 Unauthorized` / parse errors
 

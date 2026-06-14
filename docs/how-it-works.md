@@ -92,7 +92,7 @@ The resulting `event_type` is what drives the alert severity:
   medium‑severity alert so you still learn the IoC is known.
 - **`error`** — the API could not be reached or returned an error.
 
-See the [Event types reference](../event-types.md) for the severities and the
+See the [Event types reference](event-types.md) for the severities and the
 rules that map to each.
 
 ## Context added to every alert

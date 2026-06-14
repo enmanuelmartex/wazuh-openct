@@ -56,16 +56,16 @@ event.
 
 ## Documentation map
 
-- **[Requirements](getting-started/requirements.md)** — what you need before you start.
-- **[Compatibility](getting-started/compatibility.md)** — OpenCTI/Wazuh versions and why this fork exists.
-- **[How it works](getting-started/how-it-works.md)** — the query logic, end to end.
+- **[Requirements](requirements.md)** — what you need before you start.
+- **[Compatibility](compatibility.md)** — OpenCTI/Wazuh versions and why this fork exists.
+- **[How it works](how-it-works.md)** — the query logic, end to end.
 - **[What's New](whats-new.md)** — feature‑by‑feature comparison against upstream.
-- **Installation** — [files](installation/integration-files.md), [manager config](installation/manager-configuration.md), [detection rules](installation/detection-rules.md).
-- **Data sources** — [Syscheck/FIM](data-sources/syscheck-fim.md), [Sysmon](data-sources/sysmon.md), [command‑line IoCs](data-sources/commandline-iocs.md), [Linux network/DNS](data-sources/linux-sources.md).
+- **Installation** — [files](integration-files.md), [manager config](manager-configuration.md), [detection rules](detection-rules.md).
+- **Data sources** — [Syscheck/FIM](syscheck-fim.md), [Sysmon](sysmon.md), [command‑line IoCs](commandline-iocs.md), [Linux network/DNS](linux-sources.md).
 - **[Event types](event-types.md)** — every alert type and its severity.
-- **[Step‑by‑step guide](guide/step-by-step.md)** — a full walkthrough from zero to a working alert.
+- **[Step‑by‑step guide](step-by-step.md)** — a full walkthrough from zero to a working alert.
 - **[Testing & troubleshooting](testing-troubleshooting.md)**.
-- **[Script internals](reference/script-internals.md)** — for people who want to extend it.
+- **[Script internals](script-internals.md)** — for people who want to extend it.
 
 !!! warning "Credentials"
     The OpenCTI API token is a sensitive secret. Throughout this documentation it

@@ -53,7 +53,7 @@ If you find this useful, please also star/credit the upstream repositories.
 | Multi‑key queries (`filterGroups`) | ❌ | partial | ✅ **expanded** |
 | `observable_only` alert type | ❌ | ❌ | ✅ **new** |
 
-See [`docs/whats-new.md`](docs/whats-new.md) for the detailed comparison.
+See [What's new](docs/whats-new.md) for the detailed comparison.
 
 ---
 
@@ -66,7 +66,7 @@ See [`docs/whats-new.md`](docs/whats-new.md) for the detailed comparison.
    chown root:wazuh /var/ossec/integrations/custom-opencti{,.py}
    ```
 2. Add the detection rules to `/var/ossec/etc/rules/local_rules.xml`
-   (see [`docs/installation/detection-rules.md`](docs/installation/detection-rules.md)).
+   (see [Detection rules](docs/detection-rules.md)).
 3. Add the integration block to `/var/ossec/etc/ossec.conf`:
    ```xml
    <integration>
@@ -82,44 +82,34 @@ See [`docs/whats-new.md`](docs/whats-new.md) for the detailed comparison.
    systemctl restart wazuh-manager
    ```
 
-Full walkthrough: [`docs/guide/step-by-step.md`](docs/guide/step-by-step.md).
+Full walkthrough: [Step‑by‑step guide](docs/step-by-step.md).
 
 ---
 
 ## Documentation
 
-The complete documentation lives in [`docs/`](docs/) and is built with
-[MkDocs Material](https://squidfunk.github.io/mkdocs-material/):
+The complete documentation lives in [`docs/`](docs/):
 
-```bash
-pip install mkdocs-material
-mkdocs serve        # preview locally at http://127.0.0.1:8000
-mkdocs gh-deploy    # publish to GitHub Pages
-```
-
-Full table of contents:
-
-- **[Home / Overview](docs/index.md)**
 - **Getting started**
-    - [Requirements](docs/getting-started/requirements.md)
-    - [Compatibility & version history](docs/getting-started/compatibility.md)
-    - [How it works](docs/getting-started/how-it-works.md)
+    - [Requirements](docs/requirements.md)
+    - [Compatibility & version history](docs/compatibility.md)
+    - [How it works](docs/how-it-works.md)
 - **[What's new](docs/whats-new.md)**
 - **Installation**
-    - [Integration files](docs/installation/integration-files.md)
-    - [Manager configuration](docs/installation/manager-configuration.md)
-    - [Detection rules](docs/installation/detection-rules.md)
+    - [Integration files](docs/integration-files.md)
+    - [Manager configuration](docs/manager-configuration.md)
+    - [Detection rules](docs/detection-rules.md)
 - **Data sources**
-    - [Overview](docs/data-sources/overview.md)
-    - [Syscheck (FIM)](docs/data-sources/syscheck-fim.md)
-    - [Sysmon (Windows)](docs/data-sources/sysmon.md)
-    - [Command‑line IoCs](docs/data-sources/commandline-iocs.md)
-    - [Linux sources](docs/data-sources/linux-sources.md)
+    - [Overview](docs/overview.md)
+    - [Syscheck (FIM)](docs/syscheck-fim.md)
+    - [Sysmon (Windows)](docs/sysmon.md)
+    - [Command‑line IoCs](docs/commandline-iocs.md)
+    - [Linux sources](docs/linux-sources.md)
 - **[Event types](docs/event-types.md)**
-- **[Step‑by‑step guide](docs/guide/step-by-step.md)**
+- **[Step‑by‑step guide](docs/step-by-step.md)**
 - **[Testing & troubleshooting](docs/testing-troubleshooting.md)**
 - **Reference**
-    - [Script internals](docs/reference/script-internals.md)
+    - [Script internals](docs/script-internals.md)
 
 ---
 

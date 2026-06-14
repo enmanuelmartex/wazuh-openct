@@ -72,5 +72,5 @@ carried over from upstream:
     matches groups with a **regex** that accepts *both* naming schemes
     (`sysmon_eventX`, `sysmon_event_XX` **and** `sysmon_eidXX_detections`), so it
     is robust regardless of which rules you have loaded. The
-    [base Sysmon rules](../installation/detection-rules.md) provided here create
+    [base Sysmon rules](detection-rules.md) provided here create
     the `sysmon_eidXX_detections` groups for events 1, 3, 6, 7, 15, 22, 23, 24 and 25.

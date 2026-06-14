@@ -31,7 +31,7 @@ chmod 750 custom-opencti custom-opencti.py
 chown root:wazuh custom-opencti custom-opencti.py
 ```
 
-See [Integration files](../installation/integration-files.md) for detail.
+See [Integration files](integration-files.md) for detail.
 
 ## Step 3 — Add the detection rules
 
@@ -41,7 +41,7 @@ Edit `/var/ossec/etc/rules/local_rules.xml` (or **Server management → Rules �
 - the **OpenCTI threat‑intel rules** (`100210`–`100216`), and
 - if you use Sysmon, the **base Sysmon rules** (`100140`–`100149`).
 
-Full XML in [Detection rules](../installation/detection-rules.md).
+Full XML in [Detection rules](detection-rules.md).
 
 ## Step 4 — Configure the integration in the Manager
 
@@ -59,7 +59,7 @@ configuration**) and add, below `<cluster>`:
 ```
 
 Trim the `<group>` list to the sources you actually collect (see
-[Manager configuration](../installation/manager-configuration.md)).
+[Manager configuration](manager-configuration.md)).
 
 ## Step 5 — Configure the data sources
 
@@ -93,12 +93,12 @@ Trim the `<group>` list to the sources you actually collect (see
        ```
     3. Ensure the base Sysmon rules are loaded (Step 3).
 
-    Detail in [Sysmon](../data-sources/sysmon.md).
+    Detail in [Sysmon](sysmon.md).
 
 === "Linux (DNS / commands)"
 
     Add packetbeat/Suricata for the `ids` group and/or auditd for
-    `audit_command`. See [Linux sources](../data-sources/linux-sources.md).
+    `audit_command`. See [Linux sources](linux-sources.md).
 
 ## Step 6 — Restart and verify the service
 
@@ -189,4 +189,4 @@ Manager to avoid filling `integrations.log`.
 ---
 
 If nothing appears, work through
-[Testing & troubleshooting](../testing-troubleshooting.md).
+[Testing & troubleshooting](testing-troubleshooting.md).

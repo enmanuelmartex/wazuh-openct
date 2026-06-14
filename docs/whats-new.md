@@ -91,7 +91,7 @@ if not indicators and not related_obs_w_ind:
 Sysmon events 6 (driver load), 7 (image/DLL load), 15 (downloaded file ADS),
 23 (file delete), 24 (clipboard) and 25 (process tampering) are all routed
 through the SHA‑256 lookup via the group regex, together with a tuned
-[Sysmon configuration](data-sources/sysmon.md) that captures exactly these events
+[Sysmon configuration](sysmon.md) that captures exactly these events
 and suppresses high‑volume noise.
 
 ## Unchanged from upstream

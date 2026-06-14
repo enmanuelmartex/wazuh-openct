@@ -89,5 +89,5 @@ want threat‑intel enrichment for.
 4. Wazuh computes the hash → the integration queries OpenCTI → an enriched alert
    appears.
 
-See the [step‑by‑step guide](../guide/step-by-step.md) for the full test
+See the [step‑by‑step guide](step-by-step.md) for the full test
 procedure.

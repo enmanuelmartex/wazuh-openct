@@ -13,7 +13,7 @@ OpenCTI for you — it assumes a normal, working deployment of both.
 | **OpenCTI API token** | A token with **read** permissions (*Access knowledge* + *Access exploration*). Used by the script to authenticate GraphQL queries. |
 | **Network connectivity** | The Manager must reach the OpenCTI GraphQL endpoint (`http(s)://<opencti>/graphql`), typically on port 8080 or 443. |
 | **Administrative access** | Root / sudo on the Wazuh Manager host to drop the integration files and edit `ossec.conf`. |
-| **Python `requests`** | The script imports `requests`. It ships with the Wazuh framework Python, but confirm it is importable (see [Troubleshooting](../testing-troubleshooting.md)). |
+| **Python `requests`** | The script imports `requests`. It ships with the Wazuh framework Python, but confirm it is importable (see [Troubleshooting](testing-troubleshooting.md)). |
 
 ## Conditional (depending on what you want to detect)
 
@@ -24,7 +24,7 @@ endpoints:
 | To detect… | You need… |
 |------------|-----------|
 | File hashes from monitored directories | **Syscheck / FIM** — built in, nothing extra. |
-| Process hashes, DLLs, drivers, downloaded files, DNS queries, clipboard, process tampering (Windows) | **Sysmon** installed on the endpoint + the [Sysmon config](../data-sources/sysmon.md) + base Sysmon rules on the Manager. |
+| Process hashes, DLLs, drivers, downloaded files, DNS queries, clipboard, process tampering (Windows) | **Sysmon** installed on the endpoint + the [Sysmon config](sysmon.md) + base Sysmon rules on the Manager. |
 | Public IPs and URLs inside process command lines (Windows) | Sysmon Event 1 with command‑line capture (covered by the Sysmon config). |
 | Network connections to public IPs (Windows) | Sysmon Event 3. |
 | DNS queries / network IoCs (Linux) | **Packetbeat** or **Suricata** feeding the `ids` group. |

@@ -44,7 +44,7 @@ Add the Sysmon channel to the agent configuration (Agents management → Groups 
 </agent_config>
 ```
 
-Then make sure the [base Sysmon rules](../installation/detection-rules.md#part-1-base-sysmon-rules)
+Then make sure the [base Sysmon rules](detection-rules.md#part-1-base-sysmon-rules)
 are loaded on the Manager so each event lands in its `sysmon_eidXX_detections`
 group.
 
