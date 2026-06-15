@@ -26,8 +26,8 @@ On the Manager:
 cd /var/ossec/integrations
 
 # Download the integration files from GitHub
-wget https://raw.githubusercontent.com/enmanuelmartex/wazuh-openct/main/custom-opencti
-wget https://raw.githubusercontent.com/enmanuelmartex/wazuh-openct/main/custom-opencti.py
+wget https://raw.githubusercontent.com/enmanuelmartex/wazuh-opencti/main/custom-opencti
+wget https://raw.githubusercontent.com/enmanuelmartex/wazuh-opencti/main/custom-opencti.py
 
 chmod 750 custom-opencti custom-opencti.py
 chown root:wazuh custom-opencti custom-opencti.py
