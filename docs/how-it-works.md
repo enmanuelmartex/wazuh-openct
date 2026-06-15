@@ -49,6 +49,8 @@ the script simply exits without creating an alert.
 
 ## The OpenCTI query
 
+![OpenCTI Observables](assets/images/2.png){.rounded-img}
+
 For every triggering event the script sends **one** GraphQL request that asks two
 questions at once:
 

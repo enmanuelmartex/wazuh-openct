@@ -10,6 +10,8 @@ Two sets of rules are needed:
 All rules go in `/var/ossec/etc/rules/local_rules.xml` (or via **Server
 management → Rules → `local_rules.xml`** in the dashboard).
 
+![Wazuh Rules Configuration](assets/images/4.png){.rounded-img}
+
 !!! warning "Rule IDs"
     The IDs below (`100140`–`100149`, `100210`–`100216`) are examples. Change them
     if they collide with rules already in your environment.

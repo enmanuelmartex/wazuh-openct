@@ -1,11 +1,15 @@
 # Wazuh + OpenCTI Threat Intelligence Integration
 
+📖 **[Read the Full Documentation](https://enmanuelmartex.github.io/wazuh-openct/)** for interactive step-by-step guides, architecture diagrams, and more!
+
 A custom [Wazuh](https://wazuh.com/) integration that enriches alerts with threat
 intelligence from [OpenCTI](https://www.opencti.io/). When a SHA‑256 hash, IP
 address, domain, hostname or URL observed on an endpoint matches an indicator or
 observable in OpenCTI, Wazuh raises an **enriched alert** carrying the indicator
 name, score, confidence, labels, marking (TLP) and direct links back into the
 OpenCTI dashboard.
+
+🎥 **[Watch the integration in action! (Demo Video)](https://streamable.com/xgfh9b)**
 
 This fork adapts the integration to run on **modern OpenCTI (6.x / 7.x)** and adds
 new detection paths (command‑line IoC extraction, expanded Sysmon coverage and a

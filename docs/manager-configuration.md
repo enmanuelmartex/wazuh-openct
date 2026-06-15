@@ -14,6 +14,8 @@ Or, from the Wazuh dashboard: **Server management → Settings → Edit
 configuration**. Add the block below an existing section such as `<cluster>`,
 inside an `<ossec_config>` block.
 
+![Wazuh Manager Configuration](assets/images/7.png){.rounded-img}
+
 ## The integration block
 
 ```xml

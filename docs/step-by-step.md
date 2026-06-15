@@ -14,6 +14,8 @@ Sysmon and the other sources.
 1. In OpenCTI, open **Profile → API Access**.
 2. Copy the **API key**. Keep it secret.
 
+![OpenCTI API Token Generation](assets/images/3.png){.rounded-img}
+
 The same page shows the required headers; the script sets them for you.
 
 ## Step 2 — Install the integration files
@@ -48,6 +50,8 @@ Full XML in [Detection rules](detection-rules.md).
 Edit `/var/ossec/etc/ossec.conf` (or **Server management → Settings → Edit
 configuration**) and add, below `<cluster>`:
 
+![Wazuh Settings Configuration](assets/images/8.png){.rounded-img}
+
 ```xml
 <integration>
   <name>custom-opencti</name>
@@ -66,6 +70,8 @@ Trim the `<group>` list to the sources you actually collect (see
 === "FIM (native, required minimum)"
 
     On the agent (Agents management → Groups → `default`):
+
+    ![Wazuh Groups Configuration](assets/images/6.png){.rounded-img}
 
     ```xml
     <agent_config>
@@ -174,12 +180,16 @@ and indicators found.
 In the Wazuh dashboard, go to **Threat Hunting** (or **Explore → Discover**) and
 look for alerts like:
 
+![Wazuh Threat Hunting Alerts](assets/images/5.png){.rounded-img}
+
 ```text
 OpenCTI Critical: Malicious IoC [Score: 80] - Target: <indicator name>
 ```
 
 The alert includes the indicator name, score, confidence, labels, the related
 observable, the OpenCTI dashboard URL, and the detected hash / IP / domain.
+
+![Wazuh Discover Events](assets/images/9.png){.rounded-img}
 
 ## Step 11 — Disable debug (production)
 

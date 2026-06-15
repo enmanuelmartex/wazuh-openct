@@ -1,51 +1,67 @@
 # Wazuh + OpenCTI Threat Intelligence Integration
 
-This project connects a **Wazuh Manager** to an **OpenCTI** threat‑intelligence
-platform so that indicators of compromise (IoCs) seen on your endpoints are
-checked, in real time, against your CTI database. When a hash, IP address,
-domain, hostname or URL observed by Wazuh matches something stored in OpenCTI,
-Wazuh raises an **enriched alert** that carries the indicator name, score,
-confidence, labels, marking (TLP), the creating organization and direct links
-back into the OpenCTI dashboard.
+![OpenCTI Dashboard](assets/images/1.png){.rounded-img}
 
-It is a **custom Wazuh integration**: a small wrapper script plus a Python
-script that lives on the Manager, is triggered by rule groups, queries OpenCTI's
-GraphQL API, and feeds the result back into Wazuh's analysis pipeline as a new
-event.
+This project connects a [Wazuh Manager](https://wazuh.com/) to the
+[OpenCTI](https://www.opencti.io/) threat‑intelligence platform so that
+indicators of compromise (IoCs) detected on your endpoints are checked, in real
+time, against your CTI database. When a hash, IP address, domain, hostname or
+URL observed by Wazuh matches something stored in OpenCTI, Wazuh raises an
+**enriched alert** that carries the indicator name, score, confidence, labels,
+marking (TLP), the creating organization and direct links back into the OpenCTI
+dashboard.
 
-!!! info "What this fork adds"
-    The lineage is **juaromu → misje → this fork**. The original integration was
-    created by **juaromu** (`juaromu/wazuh-opencti`); **misje** later rewrote it to
-    add indicator logic; this fork is built on the original repository and adapted
-    to run on **modern OpenCTI (6.x and 7.x)** with several new detection paths.
-    See [What's New](whats-new.md) for the full comparison.
+<div class="grid cards" markdown>
+
+- :material-shield-search: **IoC Detection**
+
+    ---
+
+    Automatic identification of indicators of compromise on your endpoints.
+
+- :material-database-search: **CTI Enrichment**
+
+    ---
+
+    Queries OpenCTI in real time to retrieve threat intelligence on detected IoCs.
+
+- :material-alert-decagram: **Enriched Alerts**
+
+    ---
+
+    Generates alerts with additional context for faster, better response.
+
+- :material-chart-timeline-variant-shimmer: **Greater Context**
+
+    ---
+
+    More information for SOC analysts and better decision making.
+
+</div>
+
+!!! info "What this project adds"
+    This integration takes you from basic alerts to alerts contextualized with
+    threat intelligence, improving the visibility, prioritization and response
+    to security incidents.
+
+## Demo
+
+<div style="width:100%;height:0px;position:relative;padding-bottom:56.250%;"><iframe src="https://streamable.com/e/xgfh9b" frameborder="0" width="100%" height="100%" allowfullscreen style="width:100%;height:100%;position:absolute;left:0px;top:0px;overflow:hidden;border-radius:0.6rem;box-shadow:0 4px 10px rgba(0,0,0,0.2);"></iframe></div>
+
+<br/>
 
 ## Tested environment
 
 | Component        | Version tested            | Notes                                         |
 |------------------|---------------------------|-----------------------------------------------|
-| Wazuh Manager    | **4.14.5**                | Also verified on earlier 4.x releases         |
-| OpenCTI          | **7.2** (and 6.x)         | Upstream `misje` targeted 5.12.24 only        |
-| Sysmon           | 4.90 schema               | Windows endpoints                             |
+| Wazuh Manager    | [**4.14.5**](https://wazuh.com/) | Also verified on earlier 4.x releases |
+| OpenCTI          | [**7.2**](https://www.opencti.io/) (and 6.x) | Upstream `misje` targeted 5.12.24 only |
+| Sysmon           | **4.90** schema           | Windows endpoints                             |
 | Endpoint OS      | Windows 10/11, Linux      | Linux via auditd / packetbeat                 |
 
 ## How it fits together
 
-```
-┌─────────────┐   events    ┌──────────────┐   matched groups   ┌──────────────────┐
-│   Endpoint  │ ──────────▶ │    Wazuh     │ ─────────────────▶ │ custom-opencti.py│
-│ (Sysmon/FIM)│   (agent)   │   Manager    │   (integration)    │  (GraphQL query) │
-└─────────────┘             └──────────────┘                    └────────┬─────────┘
-                                   ▲                                      │
-                                   │       enriched alert (new event)     │ HTTP / GraphQL
-                                   └──────────────────────────────────────┤
-                                                                          ▼
-                                                                 ┌──────────────────┐
-                                                                 │     OpenCTI      │
-                                                                 │  (CTI database)  │
-                                                                 └──────────────────┘
-```
-
+![Wazuh + OpenCTI data flow](resources/wazuh-opencti-flow.svg)
 1. An agent forwards an event (a Sysmon detection, a file‑integrity change, a
    DNS query…) to the Manager.
 2. A Wazuh rule tags the event with a **group** the integration listens for.
@@ -54,18 +70,41 @@ event.
 4. If OpenCTI knows the IoC, the script emits a new event that Wazuh turns into
    an **OpenCTI alert** with a severity that depends on the match type.
 
-## Documentation map
+## Key features
 
-- **[Requirements](requirements.md)** — what you need before you start.
-- **[Compatibility](compatibility.md)** — OpenCTI/Wazuh versions and why this fork exists.
-- **[How it works](how-it-works.md)** — the query logic, end to end.
-- **[What's New](whats-new.md)** — feature‑by‑feature comparison against upstream.
-- **Installation** — [files](integration-files.md), [manager config](manager-configuration.md), [detection rules](detection-rules.md).
-- **Data sources** — [Syscheck/FIM](syscheck-fim.md), [Sysmon](sysmon.md), [command‑line IoCs](commandline-iocs.md), [Linux network/DNS](linux-sources.md).
-- **[Event types](event-types.md)** — every alert type and its severity.
-- **[Step‑by‑step guide](step-by-step.md)** — a full walkthrough from zero to a working alert.
-- **[Testing & troubleshooting](testing-troubleshooting.md)**.
-- **[Script internals](script-internals.md)** — for people who want to extend it.
+| Capability | juaromu | misje | **This fork** |
+|------------|:------:|:-----:|:-------------:|
+| Observable lookup | :material-check: | :material-check: | :material-check: |
+| Indicator lookup & STIX patterns | :material-close: | :material-check: | :material-check: |
+| Event types (match classification) | :material-close: | :material-check: (4) | :material-check: (**6**) |
+| OpenCTI version | pre‑5 syntax | 5.12.24 | **6.x / 7.x** |
+| Group matching | by position | exact string | **regex (both schemes)** |
+| Command‑line IoC extraction (EID 1) | :material-close: | :material-close: | :material-check: **new** |
+| `observable_only` alert type | :material-close: | :material-close: | :material-check: **new** |
+
+## Next steps
+
+<div class="grid cards" markdown>
+
+- :material-clipboard-check: [**Requirements**](requirements.md)
+
+    ---
+
+    Check what you need before installing.
+
+- :material-book-open-variant: [**Step‑by‑step guide**](step-by-step.md)
+
+    ---
+
+    Full walkthrough from zero to a working alert.
+
+- :material-new-box: [**What's new**](whats-new.md)
+
+    ---
+
+    Feature comparison against upstream projects.
+
+</div>
 
 !!! warning "Credentials"
     The OpenCTI API token is a sensitive secret. Throughout this documentation it

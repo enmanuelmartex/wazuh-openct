@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 470" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="Wazuh and OpenCTI threat intelligence data flow diagram">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#94a3b8"/>
+    </marker>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- figure card -->
+  <rect x="10" y="10" width="900" height="450" rx="16" fill="#0d1117" stroke="#21262d"/>
+
+  <!-- title -->
+  <text x="42" y="48" font-size="19" font-weight="700" fill="#e6edf3">Wazuh + OpenCTI — Threat Intelligence Data Flow</text>
+
+  <!-- ============ TOP ROW NODES ============ -->
+
+  <!-- Endpoint -->
+  <g filter="url(#shadow)">
+    <rect x="42" y="100" width="196" height="94" rx="12" fill="#161b22" stroke="#8b949e" stroke-width="2"/>
+  </g>
+  <text x="140" y="140" text-anchor="middle" font-size="16" font-weight="700" fill="#e6edf3">Endpoint</text>
+  <text x="140" y="164" text-anchor="middle" font-size="12.5" fill="#8b949e">Sysmon / FIM (agent)</text>
+
+  <!-- Wazuh Manager -->
+  <g filter="url(#shadow)">
+    <rect x="362" y="100" width="196" height="94" rx="12" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+  </g>
+  <text x="460" y="140" text-anchor="middle" font-size="16" font-weight="700" fill="#79c0ff">Wazuh Manager</text>
+  <text x="460" y="164" text-anchor="middle" font-size="12.5" fill="#8b949e">rules + integration</text>
+
+  <!-- custom-opencti.py -->
+  <g filter="url(#shadow)">
+    <rect x="682" y="100" width="196" height="94" rx="12" fill="#161b22" stroke="#a78bfa" stroke-width="2"/>
+  </g>
+  <text x="780" y="140" text-anchor="middle" font-size="15.5" font-weight="700" fill="#c4b5fd">custom-opencti.py</text>
+  <text x="780" y="164" text-anchor="middle" font-size="12.5" fill="#8b949e">extract IoC → query</text>
+
+  <!-- ============ OPENCTI NODE (bottom) ============ -->
+  <g filter="url(#shadow)">
+    <rect x="468" y="334" width="232" height="100" rx="12" fill="#161b22" stroke="#2dd4bf" stroke-width="2"/>
+  </g>
+  <text x="584" y="374" text-anchor="middle" font-size="16" font-weight="700" fill="#5eead4">OpenCTI</text>
+  <text x="584" y="398" text-anchor="middle" font-size="12.5" fill="#8b949e">CTI database</text>
+  <text x="584" y="416" text-anchor="middle" font-size="12" fill="#6e7681">observables + indicators (GraphQL)</text>
+
+  <!-- ============ ARROWS (top row, left to right) ============ -->
+  <line x1="238" y1="147" x2="360" y2="147" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="558" y1="147" x2="680" y2="147" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- label: events -->
+  <g>
+    <rect x="252" y="106" width="94" height="30" rx="8" fill="#161b22" stroke="#30363d"/>
+    <text x="299" y="125" text-anchor="middle" font-size="12.5" font-weight="600" fill="#e6edf3">events</text>
+  </g>
+  <!-- label: matched groups -->
+  <g>
+    <rect x="560" y="106" width="138" height="30" rx="8" fill="#161b22" stroke="#30363d"/>
+    <text x="629" y="125" text-anchor="middle" font-size="12.5" font-weight="600" fill="#e6edf3">matched groups</text>
+  </g>
+
+  <!-- ============ ARROW: script -> OpenCTI (right, going down) ============ -->
+  <path d="M 780 194 C 780 270, 720 300, 668 332" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <g>
+    <rect x="724" y="244" width="150" height="30" rx="8" fill="#161b22" stroke="#30363d"/>
+    <text x="799" y="263" text-anchor="middle" font-size="12.5" font-weight="600" fill="#e6edf3">GraphQL query · HTTP</text>
+  </g>
+
+  <!-- ============ ARROW: OpenCTI -> Wazuh (left, going up) ============ -->
+  <path d="M 500 334 C 440 300, 430 250, 452 196" fill="none" stroke="#2dd4bf" stroke-width="2" marker-end="url(#arrow)"/>
+  <g>
+    <rect x="316" y="250" width="178" height="30" rx="8" fill="#161b22" stroke="#1a3a35"/>
+    <text x="405" y="269" text-anchor="middle" font-size="12.5" font-weight="600" fill="#5eead4">enriched alert (new event)</text>
+  </g>
+
+</svg>

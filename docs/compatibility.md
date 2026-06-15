@@ -5,9 +5,16 @@ explains **why this fork exists** and which OpenCTI versions it targets.
 
 ## The three generations
 
-```
-juaromu/wazuh-opencti  ──▶  misje/wazuh-opencti  ──▶  this fork
-(original, basic)           (indicators + types)      (OpenCTI 6/7 + new sources)
+```mermaid
+graph LR
+  A["juaromu/wazuh-opencti<br/><small>Original, basic</small>"] --> B["misje/wazuh-opencti<br/><small>Indicators + types</small>"]
+  B --> C["<b>This fork</b><br/><small>OpenCTI 6/7 + new sources</small>"]
+
+  classDef old fill:transparent,stroke-dasharray: 5 5;
+  classDef current fill:transparent,stroke:#00a2ff,stroke-width:3px;
+  
+  class A,B old
+  class C current
 ```
 
 ### 1. juaromu (original)
