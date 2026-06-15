@@ -1,6 +1,6 @@
 # Wazuh + OpenCTI Threat Intelligence Integration
 
-📖 **[Read the Full Documentation](https://enmanuelmartex.github.io/wazuh-openct/)** for interactive step-by-step guides, architecture diagrams, and more!
+📖 **[Read the Full Documentation](https://enmanuelmartex.github.io/wazuh-opencti/)** for interactive step-by-step guides, architecture diagrams, and more!
 
 A custom [Wazuh](https://wazuh.com/) integration that enriches alerts with threat
 intelligence from [OpenCTI](https://www.opencti.io/). When a SHA‑256 hash, IP
