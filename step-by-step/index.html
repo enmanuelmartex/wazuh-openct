@@ -1332,18 +1332,225 @@ configuration</strong>) and add, below <code>&lt;cluster&gt;</code>:</p>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="nt">&lt;/syscheck&gt;</span>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="nt">&lt;/agent_config&gt;</span>
 </code></pre></div>
-<p><code>check_all="yes"</code> is required so <code>sha256_after</code> is present.</p>
+<p><strong>Why <code>check_all="yes"</code> is mandatory</strong></p>
+<p>Without <code>check_all="yes"</code>, Wazuh omits the <code>sha256_after</code> field from the FIM
+alert. The <code>custom-opencti.py</code> script reads <code>syscheck.sha256_after</code> to query
+OpenCTI — if the field is absent, no enrichment occurs and the event is
+silently skipped.</p>
+<div class="admonition info">
+<p class="admonition-title">Default monitored paths may not have check_all</p>
+<p>Directories Wazuh monitors out of the box — <code>System32</code>, <code>drivers\etc</code>,
+<code>Startup</code> on Windows; <code>/etc</code>, <code>/usr/bin</code> on Linux — are configured
+<strong>without</strong> <code>check_all="yes"</code>. They generate normal FIM alerts but are
+<strong>not enriched by OpenCTI</strong> unless you explicitly redefine them with that
+attribute.</p>
+</div>
+<hr />
+<p><strong>Realtime monitoring — known limitations</strong></p>
+<div class="admonition warning">
+<p class="admonition-title">Do not monitor root paths in realtime</p>
+<p>Avoid <code>realtime="yes"</code> on <code>C:\</code> (Windows) or <code>/</code> (Linux) — always use
+specific subdirectories.</p>
+<ul>
+<li><strong>Windows:</strong> <code>syscheck.max_fd_win_rt</code> (<code>internal_options.conf</code>) caps
+  realtime handles at <strong>256</strong> (max 1 024). A full-disk path exceeds this
+  and the agent silently stops reporting changes.</li>
+<li><strong>Linux:</strong> <code>fs.inotify.max_user_watches</code> (typically 8 192–65 536)
+  limits concurrent directory watches. Monitoring <code>/</code> exhausts it —
+  look for <code>ERROR: Unable to add inotify watch</code> in <code>ossec.log</code>.
+  With <code>check_all="yes"</code>, hashing the whole filesystem also causes heavy
+  CPU/IO load. Check or raise the limit if you monitor many specific paths:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>cat<span class="w"> </span>/proc/sys/fs/inotify/max_user_watches
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>sudo<span class="w"> </span>sysctl<span class="w"> </span>fs.inotify.max_user_watches<span class="o">=</span><span class="m">524288</span>
+</code></pre></div></li>
+<li><strong>Linux:</strong> <code>/proc</code>, <code>/sys</code>, and <code>/dev</code> are virtual pseudo-filesystems —
+  do not add them explicitly. Wazuh skips them automatically even if they
+  fall inside a monitored path (<code>skip_proc</code>, <code>skip_sys</code>, <code>skip_dev</code> are
+  enabled by default).</li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Scheduled fallback</p>
+<p>If you omit <code>realtime="yes"</code>, FIM falls back to <strong>scheduled mode</strong>
+(<code>&lt;frequency&gt;</code>, default <strong>12 hours</strong>). Changes are only detected on the
+next scan cycle, not immediately.</p>
+</div>
+<hr />
+<p><strong>Recommended paths to monitor</strong></p>
+<p>The following paths are best-practice additions on top of Wazuh's built-in
+defaults. Add them to your agent/group config with <code>check_all="yes"</code> to enable
+OpenCTI enrichment.</p>
+<p><em>Windows — Endpoints</em></p>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Security reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C:\Windows\System32\drivers\etc</code></td>
+<td>Hosts file tampering — DNS redirects, C2 persistence</td>
+</tr>
+<tr>
+<td><code>C:\Windows\System32</code></td>
+<td>System binary replacement, DLL hijacking</td>
+</tr>
+<tr>
+<td><code>C:\Windows\SysWOW64</code></td>
+<td>Same as above, 32-bit subsystem</td>
+</tr>
+<tr>
+<td><code>C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup</code></td>
+<td>System-wide startup persistence</td>
+</tr>
+<tr>
+<td><code>C:\Users\&lt;user&gt;\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup</code></td>
+<td>Per-user startup persistence</td>
+</tr>
+<tr>
+<td><code>C:\Windows\System32\Tasks</code></td>
+<td>Scheduled task persistence</td>
+</tr>
+<tr>
+<td><code>C:\Windows\Tasks</code></td>
+<td>Legacy scheduled task persistence</td>
+</tr>
+<tr>
+<td><code>C:\Windows\System32\WindowsPowerShell\v1.0\profile.ps1</code></td>
+<td>PowerShell profile hijacking</td>
+</tr>
+<tr>
+<td><code>C:\Users\&lt;user&gt;\Documents\WindowsPowerShell</code></td>
+<td>Per-user PowerShell profiles</td>
+</tr>
+<tr>
+<td><code>C:\Program Files</code></td>
+<td>Application binary tampering</td>
+</tr>
+<tr>
+<td><code>C:\Program Files (x86)</code></td>
+<td>Same, 32-bit applications</td>
+</tr>
+<tr>
+<td><code>C:\Users\&lt;user&gt;\Downloads</code></td>
+<td>Primary malware delivery path</td>
+</tr>
+<tr>
+<td><code>C:\Users\&lt;user&gt;\Desktop</code></td>
+<td>High-exposure user path</td>
+</tr>
+<tr>
+<td><code>C:\Users\&lt;user&gt;\Documents</code></td>
+<td>Data exfiltration, document-embedded macros</td>
+</tr>
+</tbody>
+</table>
+<p><em>Windows — Servers (AD / File Servers)</em></p>
+<p>All endpoint paths above, plus:</p>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Security reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C:\Windows\System32\config</code></td>
+<td>SAM, SYSTEM, SECURITY hive tampering</td>
+</tr>
+<tr>
+<td><code>C:\Windows\NTDS</code></td>
+<td>Active Directory database (AD DS only)</td>
+</tr>
+<tr>
+<td><code>C:\Windows\SYSVOL</code></td>
+<td>GPO and logon script persistence</td>
+</tr>
+<tr>
+<td><code>C:\inetpub\wwwroot</code></td>
+<td>Web shell deployment (IIS servers)</td>
+</tr>
+</tbody>
+</table>
+<p><em>Linux</em></p>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Security reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/etc</code></td>
+<td>System-wide configuration — broad persistence vector</td>
+</tr>
+<tr>
+<td><code>/etc/passwd</code></td>
+<td>User account manipulation, privilege escalation</td>
+</tr>
+<tr>
+<td><code>/etc/shadow</code></td>
+<td>Credential harvesting</td>
+</tr>
+<tr>
+<td><code>/etc/sudoers</code></td>
+<td>Privilege escalation via sudo rules</td>
+</tr>
+<tr>
+<td><code>/etc/ssh/sshd_config</code></td>
+<td>SSH backdoor — PermitRoot, authorized keys path</td>
+</tr>
+<tr>
+<td><code>/etc/cron.d</code>, <code>/etc/cron.daily</code>, <code>/etc/crontab</code></td>
+<td>Cron-based persistence</td>
+</tr>
+<tr>
+<td><code>/usr/bin</code>, <code>/usr/sbin</code></td>
+<td>System binary replacement (rootkits)</td>
+</tr>
+<tr>
+<td><code>/bin</code>, <code>/sbin</code></td>
+<td>Core binary replacement</td>
+</tr>
+<tr>
+<td><code>/boot</code></td>
+<td>Bootloader / kernel tampering</td>
+</tr>
+<tr>
+<td><code>/lib</code>, <code>/usr/lib</code></td>
+<td>Shared library hijacking</td>
+</tr>
+<tr>
+<td><code>/root</code></td>
+<td>Root home — SSH keys, scripts, credential files</td>
+</tr>
+<tr>
+<td><code>/home/&lt;user&gt;/.ssh</code></td>
+<td>SSH key tampering, <code>authorized_keys</code> backdoors</td>
+</tr>
+<tr>
+<td><code>/var/www</code></td>
+<td>Web shell deployment (Apache, Nginx)</td>
+</tr>
+</tbody>
+</table>
+<p>See <a href="../syscheck-fim/">Syscheck (FIM)</a> for the full attribute reference and
+noise‑reduction tips (<code>&lt;ignore&gt;</code> rules, <code>report_changes</code>).</p>
 </div>
 <div class="tabbed-block">
 <ol>
 <li>Install Sysmon with the project's tuned config:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">sysmon64</span><span class="p">.</span><span class="n">exe</span> <span class="n">-accepteula</span> <span class="n">-i</span> <span class="n">sysmonconfig</span><span class="p">.</span><span class="n">xml</span>
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">sysmon64</span><span class="p">.</span><span class="n">exe</span> <span class="n">-accepteula</span> <span class="n">-i</span> <span class="n">sysmonconfig</span><span class="p">.</span><span class="n">xml</span>
 </code></pre></div></li>
 <li>Ship the channel to Wazuh:
-   <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">&lt;localfile&gt;</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">&lt;location&gt;</span>Microsoft-Windows-Sysmon/Operational<span class="nt">&lt;/location&gt;</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">&lt;log_format&gt;</span>eventchannel<span class="nt">&lt;/log_format&gt;</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nt">&lt;/localfile&gt;</span>
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">&lt;localfile&gt;</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">&lt;location&gt;</span>Microsoft-Windows-Sysmon/Operational<span class="nt">&lt;/location&gt;</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">&lt;log_format&gt;</span>eventchannel<span class="nt">&lt;/log_format&gt;</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="nt">&lt;/localfile&gt;</span>
 </code></pre></div></li>
 <li>Ensure the base Sysmon rules are loaded (Step 3).</li>
 </ol>
@@ -1356,18 +1563,18 @@ configuration</strong>) and add, below <code>&lt;cluster&gt;</code>:</p>
 </div>
 </div>
 <h2 id="step-6-restart-and-verify-the-service">Step 6 — Restart and verify the service<a class="headerlink" href="#step-6-restart-and-verify-the-service" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>systemctl<span class="w"> </span>restart<span class="w"> </span>wazuh-manager
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>systemctl<span class="w"> </span>status<span class="w"> </span>wazuh-manager
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>systemctl<span class="w"> </span>restart<span class="w"> </span>wazuh-manager
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>systemctl<span class="w"> </span>status<span class="w"> </span>wazuh-manager
 </code></pre></div>
 <h2 id="step-7-enable-debug-logging-for-the-test">Step 7 — Enable debug logging (for the test)<a class="headerlink" href="#step-7-enable-debug-logging-for-the-test" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>nano<span class="w"> </span>/var/ossec/etc/local_internal_options.conf
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="c1"># add:</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>integrator.debug<span class="o">=</span><span class="m">1</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>systemctl<span class="w"> </span>restart<span class="w"> </span>wazuh-manager
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>nano<span class="w"> </span>/var/ossec/etc/local_internal_options.conf
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="c1"># add:</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>integrator.debug<span class="o">=</span><span class="m">1</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>systemctl<span class="w"> </span>restart<span class="w"> </span>wazuh-manager
 </code></pre></div>
 <p>Watch the integration log in another terminal:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>tail<span class="w"> </span>-f<span class="w"> </span>/var/ossec/logs/integrations.log
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>tail<span class="w"> </span>-f<span class="w"> </span>/var/ossec/logs/integrations.log
 </code></pre></div>
 <p>You will see queries sent to OpenCTI, the GraphQL responses, connection errors,
 and indicators found.</p>
@@ -1390,20 +1597,20 @@ instead. Add the indicator to test the high‑severity path.</p>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <p>Get the hash and drop the file in a monitored directory:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nb">Get-FileHash</span> <span class="p">.\</span><span class="n">test</span><span class="p">.</span><span class="n">txt</span> <span class="n">-Algorithm</span> <span class="n">SHA256</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="c"># copy the hash into OpenCTI, then move test.txt into e.g. Downloads</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nb">Get-FileHash</span> <span class="p">.\</span><span class="n">test</span><span class="p">.</span><span class="n">txt</span> <span class="n">-Algorithm</span> <span class="n">SHA256</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="c"># copy the hash into OpenCTI, then move test.txt into e.g. Downloads</span>
 </code></pre></div>
 <p>Wazuh computes the SHA‑256 → the integration queries OpenCTI → an enriched
 alert appears.</p>
 </div>
 <div class="tabbed-block">
 <p>Run a benign command that contains a test IP/URL you registered in OpenCTI:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">ping</span><span class="p">.</span><span class="n">exe</span> <span class="p">&lt;</span><span class="n">your-test-public-ip</span><span class="p">&gt;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">ping</span><span class="p">.</span><span class="n">exe</span> <span class="p">&lt;</span><span class="n">your-test-public-ip</span><span class="p">&gt;</span>
 </code></pre></div>
 </div>
 <div class="tabbed-block">
 <p>Resolve a test domain you registered:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nb">Resolve-DnsName</span> <span class="p">&lt;</span><span class="n">your-test-domain</span><span class="p">&gt;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nb">Resolve-DnsName</span> <span class="p">&lt;</span><span class="n">your-test-domain</span><span class="p">&gt;</span>
 </code></pre></div>
 </div>
 </div>
@@ -1412,7 +1619,7 @@ alert appears.</p>
 <p>In the Wazuh dashboard, go to <strong>Threat Hunting</strong> (or <strong>Explore → Discover</strong>) and
 look for alerts like:</p>
 <p><img alt="Wazuh Threat Hunting Alerts" class="rounded-img" src="../assets/images/5.png" /></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>OpenCTI Critical: Malicious IoC [Score: 80] - Target: &lt;indicator name&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>OpenCTI Critical: Malicious IoC [Score: 80] - Target: &lt;indicator name&gt;
 </code></pre></div>
 <p>The alert includes the indicator name, score, confidence, labels, the related
 observable, the OpenCTI dashboard URL, and the detected hash / IP / domain.</p>
