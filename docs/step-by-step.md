@@ -82,7 +82,108 @@ Trim the `<group>` list to the sources you actually collect (see
     </agent_config>
     ```
 
-    `check_all="yes"` is required so `sha256_after` is present.
+    **Why `check_all="yes"` is mandatory**
+
+    Without `check_all="yes"`, Wazuh omits the `sha256_after` field from the FIM
+    alert. The `custom-opencti.py` script reads `syscheck.sha256_after` to query
+    OpenCTI — if the field is absent, no enrichment occurs and the event is
+    silently skipped.
+
+    !!! info "Default monitored paths may not have check_all"
+        Directories Wazuh monitors out of the box — `System32`, `drivers\etc`,
+        `Startup` on Windows; `/etc`, `/usr/bin` on Linux — are configured
+        **without** `check_all="yes"`. They generate normal FIM alerts but are
+        **not enriched by OpenCTI** unless you explicitly redefine them with that
+        attribute.
+
+    ---
+
+    **Realtime monitoring — known limitations**
+
+    !!! warning "Do not monitor root paths in realtime"
+        Avoid `realtime="yes"` on `C:\` (Windows) or `/` (Linux) — always use
+        specific subdirectories.
+
+        - **Windows:** `syscheck.max_fd_win_rt` (`internal_options.conf`) caps
+          realtime handles at **256** (max 1 024). A full-disk path exceeds this
+          and the agent silently stops reporting changes.
+        - **Linux:** `fs.inotify.max_user_watches` (typically 8 192–65 536)
+          limits concurrent directory watches. Monitoring `/` exhausts it —
+          look for `ERROR: Unable to add inotify watch` in `ossec.log`.
+          With `check_all="yes"`, hashing the whole filesystem also causes heavy
+          CPU/IO load. Check or raise the limit if you monitor many specific paths:
+          ```bash
+          cat /proc/sys/fs/inotify/max_user_watches
+          sudo sysctl fs.inotify.max_user_watches=524288
+          ```
+        - **Linux:** `/proc`, `/sys`, and `/dev` are virtual pseudo-filesystems —
+          do not add them explicitly. Wazuh skips them automatically even if they
+          fall inside a monitored path (`skip_proc`, `skip_sys`, `skip_dev` are
+          enabled by default).
+
+    !!! note "Scheduled fallback"
+        If you omit `realtime="yes"`, FIM falls back to **scheduled mode**
+        (`<frequency>`, default **12 hours**). Changes are only detected on the
+        next scan cycle, not immediately.
+
+    ---
+
+    **Recommended paths to monitor**
+
+    The following paths are best-practice additions on top of Wazuh's built-in
+    defaults. Add them to your agent/group config with `check_all="yes"` to enable
+    OpenCTI enrichment.
+
+    *Windows — Endpoints*
+
+    | Path | Security reason |
+    |------|-----------------|
+    | `C:\Windows\System32\drivers\etc` | Hosts file tampering — DNS redirects, C2 persistence |
+    | `C:\Windows\System32` | System binary replacement, DLL hijacking |
+    | `C:\Windows\SysWOW64` | Same as above, 32-bit subsystem |
+    | `C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup` | System-wide startup persistence |
+    | `C:\Users\<user>\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup` | Per-user startup persistence |
+    | `C:\Windows\System32\Tasks` | Scheduled task persistence |
+    | `C:\Windows\Tasks` | Legacy scheduled task persistence |
+    | `C:\Windows\System32\WindowsPowerShell\v1.0\profile.ps1` | PowerShell profile hijacking |
+    | `C:\Users\<user>\Documents\WindowsPowerShell` | Per-user PowerShell profiles |
+    | `C:\Program Files` | Application binary tampering |
+    | `C:\Program Files (x86)` | Same, 32-bit applications |
+    | `C:\Users\<user>\Downloads` | Primary malware delivery path |
+    | `C:\Users\<user>\Desktop` | High-exposure user path |
+    | `C:\Users\<user>\Documents` | Data exfiltration, document-embedded macros |
+
+    *Windows — Servers (AD / File Servers)*
+
+    All endpoint paths above, plus:
+
+    | Path | Security reason |
+    |------|-----------------|
+    | `C:\Windows\System32\config` | SAM, SYSTEM, SECURITY hive tampering |
+    | `C:\Windows\NTDS` | Active Directory database (AD DS only) |
+    | `C:\Windows\SYSVOL` | GPO and logon script persistence |
+    | `C:\inetpub\wwwroot` | Web shell deployment (IIS servers) |
+
+    *Linux*
+
+    | Path | Security reason |
+    |------|-----------------|
+    | `/etc` | System-wide configuration — broad persistence vector |
+    | `/etc/passwd` | User account manipulation, privilege escalation |
+    | `/etc/shadow` | Credential harvesting |
+    | `/etc/sudoers` | Privilege escalation via sudo rules |
+    | `/etc/ssh/sshd_config` | SSH backdoor — PermitRoot, authorized keys path |
+    | `/etc/cron.d`, `/etc/cron.daily`, `/etc/crontab` | Cron-based persistence |
+    | `/usr/bin`, `/usr/sbin` | System binary replacement (rootkits) |
+    | `/bin`, `/sbin` | Core binary replacement |
+    | `/boot` | Bootloader / kernel tampering |
+    | `/lib`, `/usr/lib` | Shared library hijacking |
+    | `/root` | Root home — SSH keys, scripts, credential files |
+    | `/home/<user>/.ssh` | SSH key tampering, `authorized_keys` backdoors |
+    | `/var/www` | Web shell deployment (Apache, Nginx) |
+
+    See [Syscheck (FIM)](syscheck-fim.md) for the full attribute reference and
+    noise‑reduction tips (`<ignore>` rules, `report_changes`).
 
 === "Sysmon (Windows)"
 
